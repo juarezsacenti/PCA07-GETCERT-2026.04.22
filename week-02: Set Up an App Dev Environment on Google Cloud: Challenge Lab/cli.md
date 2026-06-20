@@ -1,5 +1,7 @@
 # Set Up an App Dev Environment on Google Cloud: Challenge Lab
 
+## Setup
+
 ```bash
 REGION=
 ZONE=
@@ -9,7 +11,6 @@ TOPIC=
 FUNCTION=
 BUCKET_NAME=$DEVSHELL_PROJECT_ID-bucket
 PROJECT_NUMBER=$(gcloud projects describe $DEVSHELL_PROJECT_ID --format='value(projectNumber)')
-
 ```
 
 ```bash
@@ -23,10 +24,24 @@ gcloud services enable \
   pubsub.googleapis.com
 ```
 
+![Set up your environment](../screenshots/week02/2026-06-20_10-22.png "Set up variables and services")
+
+*Figure 1. Set up your environment.*
+
+
+## Task 1. Create a bucket
+
 ```bash
 # ---------------- Task 1: Create a bucket -------------------
 gsutil mb -l $REGION gs://$BUCKET_NAME
 ```
+
+![Create a bucket](../screenshots/week02/2026-06-20_10-24.png "Create a bucket")
+
+*Figure 1. Create a bucket.*
+
+
+## Task 2. Create a pub/sub topic
 
 ```bash
 # ------------ Task 2: Create a Pub/Sub topic ----------------
@@ -49,6 +64,12 @@ gcloud projects add-iam-policy-binding $DEVSHELL_PROJECT_ID \
 gcloud pubsub topics create $TOPIC
 ```
 
+![Create a pub/sub topic](../screenshots/week02/2026-06-20_10-35.png "Create a pub/sub topic")
+
+*Figure 1. Create a pub/sub topic.*
+
+
+## Task 3: Create a Cloud Run Function
 
 ```bash
 # ------------ Task 3: Create a Cloud Run Function ---------------
@@ -61,7 +82,7 @@ const { Storage } = require('@google-cloud/storage');
 const { PubSub } = require('@google-cloud/pubsub');
 const sharp = require('sharp');
 
-functions.cloudEvent('$FUNCTION_NAME', async cloudEvent => {
+functions.cloudEvent('memories-thumbnail-maker', async cloudEvent => {
   const event = cloudEvent.data;
 
   console.log(`Event: ${JSON.stringify(event)}`);
@@ -71,7 +92,7 @@ functions.cloudEvent('$FUNCTION_NAME', async cloudEvent => {
   const bucketName = event.bucket;
   const size = "64x64";
   const bucket = new Storage().bucket(bucketName);
-  const topicName = "$TOPIC_NAME";
+  const topicName = "topic-memories-724";
   const pubsub = new PubSub();
 
   if (fileName.search("64x64_thumbnail") === -1) {
@@ -122,10 +143,6 @@ functions.cloudEvent('$FUNCTION_NAME', async cloudEvent => {
 });
 EOF_END
 
-sed -i "8c\functions.cloudEvent('$FUNCTION', cloudEvent => { " index.js
-
-sed -i "18c\  const topicName = '$TOPIC';" index.js
-
 cat > package.json <<EOF_END
 {
  "name": "thumbnails",
@@ -158,7 +175,7 @@ gcloud projects add-iam-policy-binding $PROJECT_ID \
 deploy_function() {
     gcloud functions deploy $FUNCTION \
     --gen2 \
-    --runtime nodejs20 \
+    --runtime nodejs22 \
     --trigger-resource $DEVSHELL_PROJECT_ID-bucket \
     --trigger-event google.storage.object.finalize \
     --entry-point $FUNCTION \
@@ -190,9 +207,26 @@ curl -o map.jpg https://storage.googleapis.com/cloud-training/gsp315/map.jpg
 gsutil cp map.jpg gs://$DEVSHELL_PROJECT_ID-bucket/map.jpg
 ```
 
+
+![Create a Cloud Run Function](../screenshots/week02/2026-06-20_11-00.png "Create a Cloud Run Function")
+
+*Figure 1. Create a Cloud Run Function.*
+
+
+# Task 4: Remove the previous cloud engineer
+
 ```bash
 # ------------ Task 4: Remove the previous cloud engineer ---------------
 gcloud projects remove-iam-policy-binding $DEVSHELL_PROJECT_ID \
 --member=user:$USER_2 \
 --role=roles/viewer
 ```
+
+![Remove the previous cloud engineer](../screenshots/week02/2026-06-20_11-12.png "Remove the previous cloud engineer")
+
+*Figure 1. Remove the previous cloud engineer.*
+
+
+![End Lab](../screenshots/week02/2026-06-20_11-11.png "End the lab")
+
+*Figure 1. End the lab.*
