@@ -1,14 +1,26 @@
 # Manage Kubernetes in Google Cloud: Challenge Lab
 
+## Setup
+
 ```bash
+CLUSTER_NAME=
 ZONE=
 export PROJECT_ID=$(gcloud config get-value project)
 export REGION="${ZONE%-*}"
-CLUSTER_NAME=
 NAMESPACE=
+INTERVAL=
+REPO_NAME=
+SERVICE_NAME=
 
 gcloud config set compute/zone $ZONE
 ```
+
+![Setup](../screenshots/week05-GKE/2026-06-23_14-09.png "Setup")
+
+*Figure 1. Setup.*
+
+
+## Task 1. Create a GKE cluster
 
 ```bash
 #------ Task 1. Create a GKE cluster ------
@@ -24,6 +36,13 @@ gcloud container clusters update $CLUSTER_NAME --enable-managed-prometheus --zon
   
 kubectl create ns $NAMESPACE
 ```
+
+![Task 1](../screenshots/week05-GKE/2026-06-23_14-17.png "Task 1")
+
+*Figure 1. Task 1.*
+
+
+## Task 2. Enable Managed Prometheus on the GKE cluster
 
 ```bash
 #------ Task 2. Enable Managed Prometheus on the GKE cluster ------
@@ -90,6 +109,13 @@ kubectl -n $NAMESPACE apply -f pod-monitoring.yaml
   
 ```
 
+![Task 2](../screenshots/week05-GKE/2026-06-23_14-20.png "Task 2")
+
+*Figure 1. Task 2.*
+
+
+## Task 3. Deploy an application onto the GKE cluster
+
 ```bash
 #------ Task 3. Deploy an application onto the GKE cluster ------
 gsutil cp -r gs://spls/gsp510/hello-app/ .
@@ -136,6 +162,13 @@ cd ..
 kubectl delete deployments helloweb  -n $NAMESPACE
 kubectl -n $NAMESPACE apply -f manifests/helloweb-deployment.yaml
 ```
+
+![Task 3](../screenshots/week05-GKE/2026-06-23_14-22.png "Task 3")
+
+*Figure 1. Task 3.*
+
+
+## Task 4. Create a logs-based metric and alerting policy
 
 ```bash
 #------ Task 4. Create a logs-based metric and alerting policy ------
@@ -185,6 +218,13 @@ gcloud alpha monitoring policies create --policy-from-file="awesome.json"
 
 ```
 
+![Task 4](../screenshots/week05-GKE/2026-06-23_14-25.png "Task 4")
+
+*Figure 1. Task 4.*
+
+
+## Task 5. Update and re-deploy your app
+
 ```bash
 #------ Task 5. Update and re-deploy your app ------
 cd manifests/
@@ -224,6 +264,14 @@ kubectl delete deployments helloweb  -n $NAMESPACE
 kubectl -n $NAMESPACE apply -f manifests/helloweb-deployment.yaml
 ```
 
+![Task 5](../screenshots/week05-GKE/2026-06-23_14-26.png "Task 5")
+
+*Figure 1. Task 5.*
+
+
+
+## Task 6. Containerize your code and deploy it onto the cluster
+
 ```bash
 #------ Task 6. Containerize your code and deploy it onto the cluster ------
 export PROJECT_ID=$(gcloud config get-value project)
@@ -241,3 +289,12 @@ kubectl expose deployment helloweb -n $NAMESPACE --name=$SERVICE_NAME --type=Loa
  
 cd ..
 ```
+
+![Task 6](../screenshots/week05-GKE/2026-06-23_14-29.png "Task 6")
+
+*Figure 1. Task 6.*
+
+
+![End the lab](../screenshots/week05-GKE/2026-06-23_14-30.png "End the lab")
+
+*Figure 1. End the lab.*
